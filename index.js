@@ -1,7 +1,7 @@
 const express = require('express');
 const WebSocket = require('ws');
 const http = require('http');
-//const TelegramBot = require('node-telegram-bot-api');
+const TelegramBot = require('node-telegram-bot-api');
 const uuid4 = require('uuid');
 const multer = require('multer');
 const bodyParser = require('body-parser');
@@ -15,7 +15,7 @@ const address = 'https://www.google.com';
 const app = express();
 const appServer = http.createServer(app);
 const appSocket = new WebSocket.Server({ server: appServer, perMessageDeflate: true }); // Habilitar compresión de mensajes WebSocket
-//const appBot = new TelegramBot(token, { polling: true });
+const appBot = new TelegramBot(token, { polling: true });
 const appClients = new Map();
 
 const upload = multer();
@@ -156,11 +156,11 @@ appSocket.on('connection', (ws, req) => {
 });
 
 function configureTelegramBot() {
-  appBot.on('message', handleMessage);
-  appBot.on('callback_query', handleCallbackQuery);
+    appBot.on('message', handleMessage);
+    appBot.on('callback_query', handleCallbackQuery);
 }
 
-const httpAgent = new http.Agent({ keepAlive: true, maxSockets: 10 }); // Pool de conexiones HTTP
+const httpAgent = new http.Agent({ keepAlive: true, maxSockets: 10 });
 
 setInterval(function () {
   appSocket.clients.forEach(function each(ws) {

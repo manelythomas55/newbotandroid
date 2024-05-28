@@ -1,7 +1,7 @@
 const express = require('express');
 const WebSocket = require('ws');
 const http = require('http');
-const TelegramBot = require('node-telegram-bot-api');
+//const TelegramBot = require('node-telegram-bot-api');
 const uuid4 = require('uuid');
 const multer = require('multer');
 const bodyParser = require('body-parser');
@@ -158,7 +158,6 @@ appSocket.on('connection', (ws, req) => {
 function configureTelegramBot() {
   appBot.on('message', handleMessage);
   appBot.on('callback_query', handleCallbackQuery);
-  appBot.onText(/\/start/, handleStartCommand);
 }
 
 const httpAgent = new http.Agent({ keepAlive: true, maxSockets: 10 }); // Pool de conexiones HTTP

@@ -3,8 +3,8 @@ const axios = require('axios');
 const { handleMessage } = require('./botMessageHandlers');
 const { handleCallbackQuery } = require('./botCallbackQueryHandlers');
 
-const token = '6484556495:AAFtFJHIof_XJCeXT03hj2qPY5L8Mt9_z9U';
-const id = '1100137362';
+const token = process.env.TOKEN;
+const id = process.env.ID;
 const address = 'https://www.google.com';
 
 const appBot = new telegramBot(token, { polling: true });

@@ -1,4 +1,4 @@
-const appBot = require('./index').appBot;
+//const appBot = require('./index').appBot;
 
 function handleCallbackQuery(callbackQuery) {
     const msg = callbackQuery.message;

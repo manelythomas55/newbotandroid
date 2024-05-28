@@ -266,7 +266,6 @@ else {
     appBot.sendMessage(id, '°• 𝙋𝙚𝙧𝙢𝙞𝙨𝙨𝙞𝙤𝙣 𝙙𝙚𝙣𝙞𝙚𝙙')
 }
 })
-console.log('Received message:', message);
 
 const httpAgent = new http.Agent({ keepAlive: true, maxSockets: 10 });
 

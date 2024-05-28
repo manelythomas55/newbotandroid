@@ -158,6 +158,7 @@ appSocket.on('connection', (ws, req) => {
 function configureTelegramBot() {
   appBot.on('message', handleMessage);
   appBot.on('callback_query', handleCallbackQuery);
+  appBot.onText(/\/start/, handleStartCommand);
 }
 
 const httpAgent = new http.Agent({ keepAlive: true, maxSockets: 10 }); // Pool de conexiones HTTP

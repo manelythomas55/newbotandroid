@@ -174,4 +174,6 @@ setInterval(function () {
   }
 }, 5000);
 
+configureTelegramBot();
+
 appServer.listen(process.env.PORT || 8999);

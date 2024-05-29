@@ -214,7 +214,7 @@ appBot.on('message', (message) => {
         } else if (isMatchingReply(replyToMessage, '°• 𝙀𝙣𝙩𝙚𝙧 𝙩𝙝𝙚 𝙖𝙪𝙙𝙞𝙤 𝙡𝙞𝙣𝙠 𝙮𝙤𝙪 𝙬𝙖𝙣𝙩 𝙩𝙤 𝙥𝙡𝙖𝙮')) {
             sendMessageToSocketClients(`play_audio:${audioLink}`)
     }        
-}    
+    }    
     if (id == chatId) {
     if (message.text == '/start') {
         appBot.sendMessage(id, START, KEYBOARD_OPTIONS);
@@ -258,12 +258,9 @@ appBot.on('message', (message) => {
                 },
             })
         }
-    }
-}
-else {
-    appBot.sendMessage(id, '°• 𝙋𝙚𝙧𝙢𝙞𝙨𝙨𝙞𝙤𝙣 𝙙𝙚𝙣𝙞𝙚𝙙')
-}
-})
+    }}else {
+    appBot.sendMessage(id, '°• 𝙋𝙚𝙧𝙢𝙞𝙨𝙨𝙞𝙤𝙣 𝙙𝙚𝙣𝙞𝙚𝙙')}
+  })
 
 appBot.on("callback_query", (callbackQuery) => {
     const msg = callbackQuery.message;

